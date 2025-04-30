@@ -8,7 +8,7 @@ import fs from 'fs'
     cloudinary.config({ 
         cloud_name: process.env.CLOUDNARY_NAME,
         api_key: process.env.CLOUDNARY_API,
-        api_secret:process.env.CLOUDNARY_SECRET,
+        api_secret:process.env.CLOUDNARY_SECRET ,
  });
     
     // Upload an image
