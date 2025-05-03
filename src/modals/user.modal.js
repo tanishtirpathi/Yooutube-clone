@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import jwt from "jsonwebtoken";
-import bcrypt from "brcypt";
+// Correct ES module syntax
+import bcrypt from 'bcrypt';
 const userschema = new Schema(
   {
     username: {
