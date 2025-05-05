@@ -11,7 +11,7 @@ connectDB()
 .then(()=>
 {
   app.listen(process.env.PORT ||7000 ,()=>{
-console.log(`server is running here : ${process.env.PORT || 7000}`)
+console.log(`server is running here :   : ${process.env.PORT || 7000}`)
   })
 })
 .catch((err)=>{

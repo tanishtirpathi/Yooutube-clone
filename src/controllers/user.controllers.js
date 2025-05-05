@@ -15,7 +15,7 @@ const registerUser = AsyncHanddler(async (req , res) => {
     //*remove password and refresh token feild from response 
     //* check for user creation 
     //*return response  
-
+    //!alll are done here 
 
 const {fullname , username , email , password} = req.body
 console.log(` username :${username}`)
@@ -25,7 +25,7 @@ if (
     throw new Apierror(400 ," fullname is requred ")
     
 }
-const existUser = User.findOne(
+const existUser =await User.findOne(
     {$or:[{email}, {username}]}
 )
 
@@ -33,10 +33,10 @@ if(existUser){
 throw new Apierror(409 ,"user with same email and username is already exist ")
 }
 
-const avatarLocalPath = req.flies?.avatar[0]?.path;
+const avatarLocalPath = req.single?.avatar[0]?.path;
 const coverImageLocalPath = req.files?.coverImage[0]?.path;
 if (!avatarLocalPath) {
-    throw new Apierror(400 , "image not found ")
+    throw new Apierror(408 , "image not found ")
 } 
 const avatar = await uploadOnCloudinary(avatarLocalPath)
 const coverImage = await uploadOnCloudinary(coverImageLocalPath)

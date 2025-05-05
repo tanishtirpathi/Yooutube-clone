@@ -79,4 +79,4 @@ userschema.methods.generateAccesstoken = async function () {
  
  
 
-export const User = mongoose.model("User", userschema);
+export const User = mongoose.model("User", userschema,"users");
