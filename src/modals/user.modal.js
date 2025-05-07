@@ -68,7 +68,7 @@ userschema.methods.generateAccesstoken = async function () {
   },process.env.ACCCESS_TOKEN_SECRET,{
     expiresIn:process.env.ACCCESS_TOKEN_EXPIRY
   })
- }
+ }  
  userschema.methods.Refreshtoken = async function () {
   jwt.sign({
     _jd:this._id,

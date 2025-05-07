@@ -17,8 +17,8 @@ const registerUser = AsyncHanddler(async (req , res) => {
     //*return response  
     //!alll are done here 
 
-const {fullname , username , email , password} = req.body
-console.log(` username :${username}`)
+    const { fullname, username, email, password } = req.body || {};
+    console.log(` username :${username}`)
 if (
     [fullname, username,    email , password].some((field)=>field?.trim()==="" )
 ) {
@@ -32,36 +32,49 @@ const existUser =await User.findOne(
 if(existUser){
 throw new Apierror(409 ,"user with same email and username is already exist ")
 }
+// Debug logging to understand incoming files
+console.log("req.files:", req.files);
 
-const avatarLocalPath = req.single?.avatar[0]?.path;
-const coverImageLocalPath = req.files?.coverImage[0]?.path;
-if (!avatarLocalPath) {
-    throw new Apierror(408 , "image not found ")
-} 
-const avatar = await uploadOnCloudinary(avatarLocalPath)
-const coverImage = await uploadOnCloudinary(coverImageLocalPath)
-if (!avatar) {
-    throw new Apierror(400 , "image not found ")
+const avatarFiles = req.files?.avatar;
+const coverImageFiles = req.files?.coverImage;
+
+if (!Array.isArray(avatarFiles) || avatarFiles.length === 0) {
+  throw new Apierror(408, "Avatar image not found", Apierror);
 }
+if (!Array.isArray(coverImageFiles) || coverImageFiles.length === 0) {
+  throw new Apierror(408, "Cover image not found");
+}
+
+const avatarLocalPath = avatarFiles[0].path;
+const coverImageLocalPath = coverImageFiles[0].path;
+
+// Upload to Cloudinary
+const avatar = await uploadOnCloudinary(avatarLocalPath);
+const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+
+if (!avatar) {
+  throw new Apierror(400, "Avatar image upload failed");
+}
+
 
 const user = await User.create({
     fullname,
     avatar:avatar.url,
     coverImage: coverImage?.url || "",
     email,
-    password,
+    password, 
     username:username.toLowerCase()
 
 })
  const createdUser = await User.findById(user._id).select(
-    "-password - refreshToken "
+    "-password -refreshToken "
  )
  if(!createdUser){
     throw new Apierror(500 , "something went wrong in server ")
  }
 
  return res.status(201).json(
-    APIresp(200, createdUser , "user registore bro tune kar liya ")
+   new APIresp(200, createdUser , "user registore bro tune kar liya ")
  )
 })
 export {registerUser}
