@@ -11,7 +11,7 @@ const generateAcessAndRefreshTOken = async (userId) => {
     const RefreshToken = user.Refreshtoken();
     user.RefreshToken = RefreshToken;
     await user.save({ validateBeforeSave: false });
-    return{accessToken , RefreshToken}
+    return { accessToken, RefreshToken };
   } catch (error) {
     throw new Apierror(
       505,
@@ -117,18 +117,55 @@ const loginUser = AsyncHanddler(async (req, res) => {
   if (!isvalidPassword) {
     throw new Apierror(404, "password is incoorect ");
   }
-  const{accessToken, RefreshToken} =await generateAcessAndRefreshTOken(user._id)
+  const { accessToken, RefreshToken } = await generateAcessAndRefreshTOken(
+    user._id
+  );
 
-const loggedInUser = user.findById(user._id).select("-password -Refreshtoken")
+  const loggedInUser = user
+    .findById(user._id)
+    .select("-password -Refreshtoken");
 
-const options = {
-  httpOnly:true,
-  secure:true,
-}
-return res.status(200).cookie("accessToken",accessToken, options ).cookie("Refreshtoken",RefreshToken,options)
-.json(new APIresp(200, {
-  user:loginUser, accessToken, RefreshToken
-}, "user logged in succesfully "
-))
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("Refreshtoken", RefreshToken, options)
+    .json(
+      new APIresp(
+        200,
+        {
+          user: loginUser,
+          accessToken,
+          RefreshToken,
+        },
+        "user logged in succesfully "
+      )
+    );
 });
-export { registerUser, loginUser };
+
+const logoutUser = AsyncHanddler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshtoken: undefined,
+      },
+    },
+    {
+      new: true,
+    }
+  );
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .clearCookie("Refreshtoken", options)
+    .json(new APIresp(200, {}, "user logged out succesfully "));
+});
+export { registerUser, loginUser, logoutUser };
