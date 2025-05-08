@@ -1,8 +1,8 @@
-import { User } from "../modals/user.modal";
-import { Apierror } from "../utils/APIerror";
-import { AsyncHanddler } from "../utils/AsyncHanddler";
-import { Jwt } from "jsonwebtoken";
-import { User } from "../modals/user.modal";
+import { User } from "../modals/user.modal.js";
+import { Apierror } from "../utils/APIerror.js";
+import { AsyncHanddler } from "../utils/AsyncHanddler.js";
+import jwt from "jsonwebtoken";
+
 
 export const verifyJWT = AsyncHanddler(async (req, _, next) => {
   try {
@@ -13,7 +13,7 @@ export const verifyJWT = AsyncHanddler(async (req, _, next) => {
       throw new Apierror(401, "unauthorize request ");
     }
 
-    const decodedToken = Jwt.verify(token, process.env.ACCCESS_TOKEN_SECRET);
+    const decodedToken = jwt.verify(token, process.env.ACCCESS_TOKEN_SECRET);
     const user = await User.findById(decodedToken?._id).select(
       "-passoword -RefreshToken"
     );
