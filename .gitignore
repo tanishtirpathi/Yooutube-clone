@@ -116,9 +116,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
-<<<<<<< HEAD
 .env
-=======
 
->>>>>>> c7638e5a769d600d71617090368dc2a5290a7e12
-# End of https://mrkandreev.name/snippets/gitignore-generator/#Node

@@ -7,19 +7,12 @@ import { APIresp } from "../utils/APIresp.js";
 const generateAcessAndRefreshTOken = async (userId) => {
   try {
     const user = await User.findById(userId);
-<<<<<<< HEAD
-    const accessToken = user.generateAccesstoken();
-    const RefreshToken = user.Refreshtoken();
-    user.RefreshToken = RefreshToken;
-    await user.save({ validateBeforeSave: false });
-    return { accessToken, RefreshToken };
-=======
+
     const AccessToken = user.generateAccesstoken();
     const RefreshToken = user.Refreshtoken();
     user.RefreshToken = RefreshToken;
     await user.save({ validateBeforeSave: false });
     return { AccessToken, RefreshToken };
->>>>>>> c7638e5a769d600d71617090368dc2a5290a7e12
   } catch (error) {
     throw new Apierror(
       505,
@@ -109,13 +102,9 @@ const loginUser = AsyncHanddler(async (req, res) => {
   //*access and refressh token generate and five to user
   //* send through secure cookie
 
-<<<<<<< HEAD
-  const { username, email, password } = req.body;
-  if (!(username || email)) {
-=======
+
   const { username, email, password } = req.body || {};
 if (!username && !email) {
->>>>>>> c7638e5a769d600d71617090368dc2a5290a7e12
     throw new Apierror(400, "username name and password is not correct ");
   }
   const user = await User.findOne({
@@ -130,11 +119,8 @@ if (!username && !email) {
   if (!isvalidPassword) {
     throw new Apierror(404, "password is incoorect ");
   }
-<<<<<<< HEAD
-  const { accessToken, RefreshToken } = await generateAcessAndRefreshTOken(
-=======
+
   const { AccessToken, RefreshToken } = await generateAcessAndRefreshTOken(
->>>>>>> c7638e5a769d600d71617090368dc2a5290a7e12
     user._id
   );
 
@@ -148,11 +134,8 @@ if (!username && !email) {
   };
   return res
     .status(200)
-<<<<<<< HEAD
-    .cookie("accessToken", accessToken, options)
-=======
+
     .cookie("accessToken", AccessToken, options)
->>>>>>> c7638e5a769d600d71617090368dc2a5290a7e12
     .cookie("Refreshtoken", RefreshToken, options)
     .json(
       new APIresp(
