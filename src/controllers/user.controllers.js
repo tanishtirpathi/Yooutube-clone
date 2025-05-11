@@ -7,11 +7,11 @@ import { APIresp } from "../utils/APIresp.js";
 const generateAcessAndRefreshTOken = async (userId) => {
   try {
     const user = await User.findById(userId);
-    const accessToken = user.generateAccesstoken();
+    const AccessToken = user.generateAccesstoken();
     const RefreshToken = user.Refreshtoken();
     user.RefreshToken = RefreshToken;
     await user.save({ validateBeforeSave: false });
-    return { accessToken, RefreshToken };
+    return { AccessToken, RefreshToken };
   } catch (error) {
     throw new Apierror(
       505,
@@ -101,8 +101,8 @@ const loginUser = AsyncHanddler(async (req, res) => {
   //*access and refressh token generate and five to user
   //* send through secure cookie
 
-  const { username, email, password } = req.body;
-  if (!username || !email) {
+  const { username, email, password } = req.body || {};
+if (!username && !email) {
     throw new Apierror(400, "username name and password is not correct ");
   }
   const user = await User.findOne({
@@ -117,7 +117,7 @@ const loginUser = AsyncHanddler(async (req, res) => {
   if (!isvalidPassword) {
     throw new Apierror(404, "password is incoorect ");
   }
-  const { accessToken, RefreshToken } = await generateAcessAndRefreshTOken(
+  const { AccessToken, RefreshToken } = await generateAcessAndRefreshTOken(
     user._id
   );
 
@@ -131,7 +131,7 @@ const loginUser = AsyncHanddler(async (req, res) => {
   };
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
+    .cookie("accessToken", AccessToken, options)
     .cookie("Refreshtoken", RefreshToken, options)
     .json(
       new APIresp(

@@ -1,23 +1,28 @@
 {
   "name": "youtube-clone",
   "version": "1.0.0",
-  "description": "This is the project which I am making while learning the backend ",
+  "description": "this is the backend project just a clone of youtube",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tanishtirpathi/Yooutube-clone.git"
   },
   "keywords": [
-    "Javascript",
-    "Backend"
+    "javascript",
+    "tony",
+    "stark",
+    "backend"
   ],
-  "author": "Tanish Tirpathi",
+  "author": "tanish tirpathi",
   "license": "ISC",
-  "devDependencies": {
-    "nodemon": "^3.1.10",
-    "prettier": "^3.5.3"
+  "bugs": {
+    "url": "https://github.com/tanishtirpathi/Yooutube-clone/issues"
   },
+<<<<<<< HEAD
   "dependencies": {
     "bcrypt": "^5.1.1",
     "brcypt": "^1.0.1",
@@ -27,8 +32,13 @@
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.13.2",
+    "mongoose": "^8.14.2",
     "mongoose-aggregate-paginate-v2": "^1.1.4",
     "multer": "^1.4.5-lts.2"
+=======
+  "homepage": "https://github.com/tanishtirpathi/Yooutube-clone#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+>>>>>>> 1eae18c08a4dd6834183c65eb501f51b20f32805
   }
 }
