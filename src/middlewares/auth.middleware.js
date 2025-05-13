@@ -17,6 +17,7 @@ req.header("Authorization")?.replace("Bearer ", "");
       "-passoword -refreshToken"
     );
     if (!user) {
+      
       throw new Apierror(401, "inveled token ");
     }
     req.user = user;
