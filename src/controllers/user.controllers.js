@@ -325,7 +325,6 @@ export {
   updateAccountdetail,
   refreshAccesToken,
   getCureentUser,
-  getCureentUser,
   updateUserAvatar,
   updateUserCoverImage,
 };
