@@ -371,13 +371,12 @@ const getUserchannelProfile = AsyncHanddler(async (req, res) => {
       },
     },
   ]);
-  if(!channel?.length){
-    throw new Apierror(404 ,"channel does not exist")
+  if (!channel?.length) {
+    throw new Apierror(404, "channel does not exist");
   }
-  return res.status(200),
-  .json(
-    new APIresp(200 , channel[0], "user channel fetch sucesfully ")
-  )
+  return res
+    .status(200)
+    .json(new APIresp(200, channel[0], "user channel fetch sucesfully "));
 });
 export {
   registerUser,
@@ -388,4 +387,5 @@ export {
   getCureentUser,
   updateUserAvatar,
   updateUserCoverImage,
+  getUserchannelProfile,
 };
