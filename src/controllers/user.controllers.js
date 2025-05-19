@@ -280,7 +280,7 @@ const updateUserAvatar = AsyncHanddler(async (req, res) => {
   if (!avatar.url) {
     throw new Apierror(400, "error while uploading ");
   }
-  const user =  await User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
@@ -289,10 +289,7 @@ const updateUserAvatar = AsyncHanddler(async (req, res) => {
     },
     { new: true }
   ).select("-password");
-    return res
-    .status(200)
-    .json(new Apierror(200, user, " image updated"));
-
+  return res.status(200).json(new Apierror(200, user, " image updated"));
 });
 
 const updateUserCoverImage = AsyncHanddler(async (req, res) => {
@@ -304,7 +301,7 @@ const updateUserCoverImage = AsyncHanddler(async (req, res) => {
   if (!coverImage.url) {
     throw new Apierror(400, "error while uploading ");
   }
- const user =  await User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.user?._id,
     {
       $set: {
@@ -313,10 +310,74 @@ const updateUserCoverImage = AsyncHanddler(async (req, res) => {
     },
     { new: true }
   ).select("-password");
-    return res
+  return res
     .status(200)
-    .json(new Apierror(200, user, " cover image update succsesfully"));
+    .json(new APIresp(200, user, " cover image update succsesfully"));
+});
 
+const getUserchannelProfile = AsyncHanddler(async (req, res) => {
+  const { username } = req.params;
+  if (!username?.trim()) {
+    throw new Apierror(400, "username is not avalibale ");
+  }
+  const channel = await User.aggregate([
+    {
+      $match: {
+        username: username?.toLowerCase(),
+      },
+    },
+    {
+      $lookup: {
+        from: "subscirptions",
+        localField: "_id",
+        foreignField: "channel ",
+        as: "subscribers",
+      },
+    },
+    {
+      $lookup: {
+        from: "subscirptions",
+        localField: "_id",
+        foreignField: "subscriber ",
+        as: "subscribed-to ",
+      },
+    },
+    {
+      $addFields: {
+        subscriberCount: {
+          $size: "$subscribers",
+        },
+        channelSubscribedToCount: {
+          $size: "$subscribed-to",
+        },
+        issubscribed: {
+          $cond: {
+            if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+            then: true,
+            else: false,
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        fullName: 1,
+        username: 1,
+        channelSubscribedToCount: 1,
+        subscriberCount: 1,
+        avatar: 1,
+        coverImage: 1,
+        issubscribed: 1,
+      },
+    },
+  ]);
+  if(!channel?.length){
+    throw new Apierror(404 ,"channel does not exist")
+  }
+  return res.status(200),
+  .json(
+    new APIresp(200 , channel[0], "user channel fetch sucesfully ")
+  )
 });
 export {
   registerUser,
