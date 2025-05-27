@@ -190,10 +190,13 @@ const logoutUser = AsyncHanddler(async (req, res) => {
 });
 
 const refreshAccesToken = AsyncHanddler(async (req, res) => {
-  const incomingRefreshToken = req.cookie.refreshToken || req.body.refreshToken;
-  if (incomingRefreshToken) {
-    throw new Apierror(401, "unauthrised request ");
+  const incomingRefreshToken =
+    req.cookies?.refreshToken || req.body?.refreshToken;
+
+  if (!incomingRefreshToken) {
+    throw new Apierror(401, "Unauthorized request");
   }
+
   try {
     const decodedToken = jwt.verify(
       incomingRefreshToken,
@@ -203,18 +206,20 @@ const refreshAccesToken = AsyncHanddler(async (req, res) => {
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
-      throw new Apierror(401, "invalid request token ");
-    }
-    if (incomingRefreshToken !== user?.refreshToken) {
-      throw new Apierror(401, "Refresh token is expired ");
+      throw new Apierror(401, "Invalid refresh token - user not found");
     }
 
+    if (incomingRefreshToken !== user.refreshToken) {
+      throw new Apierror(403, "Refresh token expired or invalid");
+    }
+
+    const { accessToken, refreshToken: newRefreshToken } =
+      await generateAccessAndRefreshTokens(user._id);
+
     const options = {
-      httpsOnly: true,
+      httpOnly: true,
       secure: true,
     };
-    const { accessToken, newRefreshToken } =
-      await generateAccessAndRefreshTokens(user._id);
 
     return res
       .status(200)
@@ -224,20 +229,17 @@ const refreshAccesToken = AsyncHanddler(async (req, res) => {
         new APIresp(
           200,
           { accessToken, refreshToken: newRefreshToken },
-          "access token refresh succesfully "
+          "Access token refreshed successfully"
         )
       );
   } catch (error) {
-    throw new Apierror(
-      401,
-      error?.messsage || "invalid code of refresh token "
-    );
+    throw new Apierror(403, error.message || "Invalid refresh token");
   }
 });
 
 const changecurrentpassword = AsyncHanddler(async (req, res) => {
   const { oldPassword, newPassword } = req.body;
-  const user = await User.findById(req.user?._sid);
+  const user = await User.findById(req.user?._id);
   const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
   if (!isPasswordCorrect) {
@@ -249,9 +251,29 @@ const changecurrentpassword = AsyncHanddler(async (req, res) => {
 });
 
 const getCureentUser = AsyncHanddler(async (req, res) => {
-  return res.status(200).json(200, res.user, "current user fetch");
+  if (!req.user) {
+    return res.status(401).json({
+      statusCode: 401,
+      message: "Unauthorized: User not authenticated",
+      data: null,
+    });
+  }
+
+  return res.status(200).json({
+    statusCode: 200,
+    message: "Current user fetch",
+    data: req.user,
+  });
 });
+
 const updateAccountdetail = AsyncHanddler(async (req, res) => {
+    if (!req.body) {
+    return res.status(400).json({
+      statusCode: 400,
+      message: "Request body is missing",
+      data: null,
+    });
+  }
   const { fullName, email } = req.body;
   if (!fullName || !email) {
     throw new Apierror(400, "all feild required");
@@ -266,10 +288,12 @@ const updateAccountdetail = AsyncHanddler(async (req, res) => {
     },
     { new: true }
   ).select("-password");
+return res.status(200).json({
+  statusCode: 200,
+  success: true,
+  message: "Account details updated successfully",
+});
 
-  return res
-    .status(200)
-    .json(new Apierror(200, user, "acount detail updated succsesfully"));
 });
 
 const updateUserAvatar = AsyncHanddler(async (req, res) => {
@@ -380,7 +404,7 @@ const getUserchannelProfile = AsyncHanddler(async (req, res) => {
     .json(new APIresp(200, channel[0], "user channel fetch sucesfully "));
 });
 
-const userWatchHistory = AsyncHandler(async (req, res) => {
+const userWatchHistory = AsyncHanddler(async (req, res) => {
   const user = await User.aggregate([
     {
       $match: {
